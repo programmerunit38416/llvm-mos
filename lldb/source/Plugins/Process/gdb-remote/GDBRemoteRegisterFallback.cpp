@@ -20,6 +20,7 @@ namespace process_gdb_remote {
 #define R64(name) REG(name, 8)
 #define R32(name) REG(name, 4)
 #define R16(name) REG(name, 2)
+#define R8(name) REG(name, 1)
 
 static std::vector<DynamicRegisterInfo::Register> GetRegisters_aarch64() {
   ConstString empty_alt_name;
@@ -44,6 +45,23 @@ static std::vector<DynamicRegisterInfo::Register> GetRegisters_msp430() {
       R16(pc),  R16(sp),  R16(r2),  R16(r3), R16(fp),  R16(r5),
       R16(r6),  R16(r7),  R16(r8),  R16(r9), R16(r10), R16(r11),
       R16(r12), R16(r13), R16(r14), R16(r15)};
+
+  return registers;
+}
+
+// MOS 6502 registers - order matches MAME's gdb_register_map_m6502
+static std::vector<DynamicRegisterInfo::Register> GetRegisters_mos() {
+  ConstString empty_alt_name;
+  ConstString reg_set{"general purpose registers"};
+
+  std::vector<DynamicRegisterInfo::Register> registers{
+      R8(a),    // accumulator
+      R8(x),    // X index register
+      R8(y),    // Y index register
+      R8(p),    // processor status flags
+      R8(sp),   // stack pointer
+      R16(pc),  // program counter
+  };
 
   return registers;
 }
@@ -75,6 +93,8 @@ static std::vector<DynamicRegisterInfo::Register> GetRegisters_x86_64() {
   return registers;
 }
 
+#undef R8
+#undef R16
 #undef R32
 #undef R64
 #undef REG
@@ -84,6 +104,8 @@ GetFallbackRegisters(const ArchSpec &arch_to_use) {
   switch (arch_to_use.GetMachine()) {
   case llvm::Triple::aarch64:
     return GetRegisters_aarch64();
+  case llvm::Triple::mos:
+    return GetRegisters_mos();
   case llvm::Triple::msp430:
     return GetRegisters_msp430();
   case llvm::Triple::x86:

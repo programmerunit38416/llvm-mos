@@ -9,3 +9,8 @@ foreach(target AArch64 ARM ARC Hexagon LoongArch Mips MSP430 PowerPC RISCV Syste
     add_subdirectory(${target})
   endif()
 endforeach()
+
+# MOS is an experimental target
+if ("MOS" IN_LIST LLVM_EXPERIMENTAL_TARGETS_TO_BUILD)
+  add_subdirectory(MOS)
+endif()
